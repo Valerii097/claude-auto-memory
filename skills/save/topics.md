@@ -14,13 +14,20 @@ Both skills (`/save` and `/recall`) read this file to map the user's words to fo
 | vocabulary, language learning | `Language/` |
 | anything else / unclear | `General/` (create it if missing) |
 
+## THE MAIN RULE: one project = one folder
+
+Every distinct project/bot/product gets ITS OWN folder named after it. The thematic folders in the table above are only for knowledge NOT tied to a specific project.
+
+- **A new project appears in the conversation** (its own repo / its own bot / its own deliverable) → offer to create a new `<Project-Name>/` folder. Do NOT file it under a thematic folder or under a similar project's folder
+- **Same stack ≠ same project.** Two Telegram bots (one monitors crypto, one answers messages) are TWO folders, even if the technology is identical
+- **In doubt whether it's the same project or a new one** → ALWAYS ask the user: `Is this part of [X] or a separate project? If separate, I'll create [Y/]`. Never merge two projects silently
+- **Personas/contacts inside one codebase** (e.g. different conversation partners of one multi-bot): one project by default, but if the user seems to treat them separately — ask and split
+
 ## Folder separation rules
 
-- One folder per **big ongoing project** (its name = folder name); shared infrastructure notes go to `Infra/`.
-- If a conversation is about deploying project X to a server, prefer the project folder over `Infra/` — knowledge follows the project.
+- Knowledge about a SPECIFIC project goes to that project's folder, even when the theme sounds generic ("deploying the bot to the server" → the bot's folder, not `Infra/`).
+- `Infra/` is for infrastructure not owned by any single project.
 
 ## New folders
 
-If a new theme fits no existing folder — ASK the user before creating a new folder. Never create silently.
-
-If it is unclear which existing folder fits — ask: `Is this more [Infra] or [Bots]?`
+A new theme with no matching folder → ASK the user, never create silently. Unclear between existing folders → ask: `Is this more [Infra] or [Bots]?`

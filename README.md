@@ -71,12 +71,22 @@ Open the base as an Obsidian vault and the wikilinks, backlinks and graph just w
 If you run Claude Code on several machines (e.g. a laptop and a VPS agent), make the base a git repo with a private remote, then wire up `sync/`:
 
 1. **Every machine:** clone the base; install the skills with that path.
-2. **Interactive machines:** merge `sync/hooks-example.json` into `~/.claude/settings.json` — pull on session start, push on session end.
-3. **Headless machines (Linux):** copy `sync/memory-sync.sh` to `/usr/local/bin/`, the `memory-sync.service` + `.timer` units to `/etc/systemd/system/`, then `systemctl enable --now memory-sync.timer`. The base syncs every 5 minutes.
+2. **Concurrent appends merge themselves:** in the base repo run
+   ```bash
+   echo '*.md merge=union' >> .gitattributes
+   ```
+   — knowledge files are append-only, so `merge=union` lets git combine two machines appending to the same file instead of raising a conflict.
+3. **Interactive machines:** copy `sync/memory-push.ps1` into the base, then merge `sync/hooks-example.json` into `~/.claude/settings.json` — pull on session start, push on session end.
+4. **Headless machines (Linux):** copy `sync/memory-sync.sh` to `/usr/local/bin/`, the `memory-sync.service` + `.timer` units to `/etc/systemd/system/`, then `systemctl enable --now memory-sync.timer`. The base syncs every 5 minutes.
 
-Conflict policy: commit first, `pull --rebase`, push; on a rebase conflict the script aborts cleanly and leaves the resolution to you (append-only files make real conflicts rare).
+Conflict policy: commit first, `pull --rebase`, push; on a real rebase conflict the script aborts cleanly and leaves the resolution to you.
 
-**Secrets note:** the skills forbid writing keys/tokens into memory (they become `<<REDACTED>>`), because a synced base lives in git. Keep the remote private regardless.
+**Secrets — two layers:** the skills forbid writing keys/tokens into memory (they become `<<REDACTED>>`), and the push scripts carry a **secret gate** — any staged change that introduces key-shaped content (`sk-…`, `ghp_…`, `AKIA…`, JWTs, private keys) is excluded from the sync with a warning until you clean it. Keep the remote private regardless.
+
+## Tips
+
+- **Save mid-session in long conversations.** Claude Code compacts the start of very long chats; a `/save` at the very end may no longer see early details. Saving once in the middle and once at the end captures everything (repeat saves append — nothing is overwritten).
+- **One project = one folder.** The save skill asks before filing a new project, and never merges two projects silently — two bots on the same stack are still two folders.
 
 ## Anatomy
 

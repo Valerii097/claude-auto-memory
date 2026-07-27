@@ -1,5 +1,5 @@
 {
-  "//": "Merge these into the 'hooks' section of ~/.claude/settings.json. They pull the memory base when a Claude Code session starts and push your new knowledge when it ends. Windows version shown; for macOS/Linux replace the command with: git -C ~/claude-memory pull --rebase --autostash --quiet  (and the matching add/commit/push line).",
+  "//": "Merge these into the 'hooks' section of ~/.claude/settings.json. They pull the memory base when a Claude Code session starts and push your new knowledge when it ends. Windows version shown; for macOS/Linux use: git -C ~/claude-memory pull --rebase --autostash --quiet (start) and MEMORY_DIR=~/claude-memory bash /path/to/memory-sync.sh (end). The push goes through memory-push.ps1 / memory-sync.sh so the secret gate can catch key-shaped content before it reaches the remote — copy that script into your memory base first.",
   "hooks": {
     "SessionStart": [
       {
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell.exe -NoProfile -Command 'Set-Location \"$env:USERPROFILE/claude-memory\"; git add -A .; if (git status --porcelain) { git commit -q -m \"memory: auto\"; git pull -q --rebase --autostash; git push -q }'",
+            "command": "powershell.exe -NoProfile -Command '& \"$env:USERPROFILE/claude-memory/memory-push.ps1\"'",
             "timeout": 120,
             "statusMessage": "memory: push"
           }

@@ -38,7 +38,8 @@ You receive a BRIEF from the main model: date, scenario (A/B/C/D), facts to save
 - ISO dates `YYYY-MM-DD`; the date comes from the brief, never a placeholder
 - Filenames: lowercase kebab-case, English; file contents: the user's language
 - NEVER write secrets (keys, tokens, passwords) — replace with `<<REDACTED>>`
-- Topic fits no folder in `topics.md` — do NOT create a folder; return it as a question in your report
+- The folder named in the brief WINS over the `topics.md` mapping — the main model already agreed it with the user ("one project = one folder"). If the brief authorizes creating a new project folder — create it
+- Topic fits no folder and the brief names none — do NOT create a folder; return it as a question in your report
 
 ## Report (what the main model sees)
 

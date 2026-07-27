@@ -43,12 +43,23 @@ Look for a previous `/save` invocation in this chat's history.
 - Found → save ONLY what happened after the last one
 - Not found → save everything important from the whole conversation
 
+⚠️ In a very long chat, early details may already be compacted away by context summarization. If you can see the start of the conversation was trimmed — say so honestly in your report and suggest saving mid-session next time.
+
 ### 2. Pick the scenario (only chat history can tell)
 
 - **A** — first `/save` in this chat → new file
 - **B** — repeat `/save` in the same chat → append to the file linked in your previous save report
 - **C** — new chat, new topic → new independent file. Do NOT attach to existing files unless the user explicitly asks
 - **D** — user explicitly said "this continues X" → part-file (chain)
+
+### 2.5 Identify the project and folder (BEFORE the brief — only you see the chat)
+
+The rule is "one project = one folder" — details in `topics.md`. If the conversation is about a specific project:
+- the project already has a folder → pass it in the brief
+- the project is NEW (its own repo/bot/deliverable, even on a familiar stack) → ask the user: `Create a new folder <Name/> for this project?` and pass the answer in the brief
+- in doubt whether it's part of [X] or separate → ask. Never merge two projects silently
+
+Ask the user BEFORE calling the subagent — it cannot see the chat and cannot ask follow-ups.
 
 ### 3. Build the brief and call the subagent
 
@@ -57,7 +68,8 @@ Call the Agent tool: `subagent_type: "memory-saver"`, `run_in_background: false`
 ```
 Date: YYYY-MM-DD (today's real date)
 Scenario: A/B/C/D. For B/D — target file: [[Folder/name]]
-Topic: one line (so the subagent can map it to a folder via topics.md)
+Folder: <exact folder from step 2.5; for a new project — "create new folder <Name/>">
+Topic: one line
 Facts to save:
 - [filtered by the priorities above — specifics: commands, paths, decisions, root causes]
 Open problems 🔴: [undeployed / unverified / contradictions — or "none"]
