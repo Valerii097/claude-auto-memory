@@ -7,7 +7,7 @@ Set-Location $MemoryDir
 git add -A .
 
 # Secret gate: unstage any file whose staged diff introduces key-shaped content.
-$pattern = 'sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|eyJhbGciOi|-----BEGIN [A-Z ]*PRIVATE KEY|AIza[0-9A-Za-z_-]{30,}'
+$pattern = 'sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|eyJhbGciOi[A-Za-z0-9_-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY|AIza[0-9A-Za-z_-]{30,}'
 foreach ($f in (git diff --cached --name-only)) {
   $diff = (git diff --cached -- $f) -join "`n"
   if ($diff -match $pattern) {
