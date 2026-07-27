@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync the Claude memory base with its git remote
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust the path if your base lives elsewhere:
+Environment=MEMORY_DIR=/root/claude-memory
+ExecStart=/usr/local/bin/memory-sync.sh

@@ -1,0 +1,29 @@
+{
+  "//": "Merge these into the 'hooks' section of ~/.claude/settings.json. They pull the memory base when a Claude Code session starts and push your new knowledge when it ends. Windows version shown; for macOS/Linux replace the command with: git -C ~/claude-memory pull --rebase --autostash --quiet  (and the matching add/commit/push line).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -Command 'git -C \"$env:USERPROFILE/claude-memory\" pull --rebase --autostash --quiet'",
+            "timeout": 60,
+            "statusMessage": "memory: pull"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -Command 'Set-Location \"$env:USERPROFILE/claude-memory\"; git add -A .; if (git status --porcelain) { git commit -q -m \"memory: auto\"; git pull -q --rebase --autostash; git push -q }'",
+            "timeout": 120,
+            "statusMessage": "memory: push"
+          }
+        ]
+      }
+    ]
+  }
+}
