@@ -86,6 +86,8 @@ Conflict policy: commit first, `pull --rebase`, push; on a real rebase conflict 
 ## Tips
 
 - **Save mid-session in long conversations.** Claude Code compacts the start of very long chats; a `/save` at the very end may no longer see early details. Saving once in the middle and once at the end captures everything (repeat saves append — nothing is overwritten).
+- **Let Claude remind you.** Add this line to your `~/.claude/CLAUDE.md` and Claude will offer a `/save` once when a long conversation has accumulated unsaved decisions:
+  > If the conversation has grown long, contains important decisions or fixes, and there has been no /save for a while — briefly offer to run /save once (knowledge from the start of a long chat gets lost to context compaction). Do not repeat the offer.
 - **One project = one folder.** The save skill asks before filing a new project, and never merges two projects silently — two bots on the same stack are still two folders.
 
 ## Anatomy
