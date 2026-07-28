@@ -12,14 +12,16 @@ mkdir -p "$SKILLS" "$AGENTS" "$MEMORY_PATH"
 
 cp -r "$SRC/skills/save"   "$SKILLS/"
 cp -r "$SRC/skills/recall" "$SKILLS/"
+cp -r "$SRC/skills/unsave" "$SKILLS/"
 cp "$SRC/agents/memory-saver.md"    "$AGENTS/"
 cp "$SRC/agents/memory-recaller.md" "$AGENTS/"
+cp "$SRC/agents/memory-undoer.md"   "$AGENTS/"
 
 # Point every installed file at the chosen memory base.
 if [ "$MEMORY_PATH" != "$HOME/claude-memory" ]; then
-  find "$SKILLS/save" "$SKILLS/recall" -type f -name '*.md' \
+  find "$SKILLS/save" "$SKILLS/recall" "$SKILLS/unsave" -type f -name '*.md' \
     -exec sed -i.bak "s|~/claude-memory|$MEMORY_PATH|g" {} \; -exec rm -f {}.bak \;
-  for f in "$AGENTS/memory-saver.md" "$AGENTS/memory-recaller.md"; do
+  for f in "$AGENTS/memory-saver.md" "$AGENTS/memory-recaller.md" "$AGENTS/memory-undoer.md"; do
     sed -i.bak "s|~/claude-memory|$MEMORY_PATH|g" "$f" && rm -f "$f.bak"
   done
 fi

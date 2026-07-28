@@ -13,12 +13,14 @@ New-Item -ItemType Directory -Force $skills, $agents, $MemoryPath | Out-Null
 
 Copy-Item -Recurse -Force "$src\skills\save"   "$skills\save"
 Copy-Item -Recurse -Force "$src\skills\recall" "$skills\recall"
+Copy-Item -Recurse -Force "$src\skills\unsave" "$skills\unsave"
 Copy-Item -Force "$src\agents\memory-saver.md"    "$agents\memory-saver.md"
 Copy-Item -Force "$src\agents\memory-recaller.md" "$agents\memory-recaller.md"
+Copy-Item -Force "$src\agents\memory-undoer.md"   "$agents\memory-undoer.md"
 
 # Point every installed file at the chosen memory base.
-$targets = Get-ChildItem -Recurse -File "$skills\save", "$skills\recall" | Select-Object -ExpandProperty FullName
-$targets += "$agents\memory-saver.md", "$agents\memory-recaller.md"
+$targets = Get-ChildItem -Recurse -File "$skills\save", "$skills\recall", "$skills\unsave" | Select-Object -ExpandProperty FullName
+$targets += "$agents\memory-saver.md", "$agents\memory-recaller.md", "$agents\memory-undoer.md"
 foreach ($f in $targets) {
   (Get-Content $f -Raw).Replace('~/claude-memory', $MemoryPath) | Set-Content $f -Encoding utf8 -NoNewline
 }
