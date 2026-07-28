@@ -1,19 +1,37 @@
-# claude-auto-memory
+# Claude Auto Memory
 
-Persistent, human-readable memory for [Claude Code](https://claude.com/claude-code): two skills (`/save`, `/recall`) that turn your conversations into an **Obsidian-compatible Markdown knowledge base** — and keep it cheap by delegating the file work to a smaller model.
+![Claude Auto Memory](assets/banner.png)
+
+**Give Claude Code a memory that survives the chat.** Three skills — `/save`, `/recall`, `/unsave` — that turn your conversations into a personal, Obsidian-compatible Markdown knowledge base. Local files, your language, no databases, no lock-in.
+
+## The problem
+
+Every Claude Code session starts from zero. You spend an evening debugging a nasty sync issue, make three smart decisions, find the one command that fixes everything… and tomorrow Claude remembers none of it. You re-explain your project. You re-discover the same dead ends. The knowledge existed — for exactly one chat.
+
+## What this does
 
 ```
-you ──/save──▶ main model extracts facts ──brief──▶ memory-saver (Sonnet) writes files
-you ◀─report── main model relays          ◀─done───┘
+you ──/save──▶ main model extracts what mattered ──brief──▶ memory-saver (cheap model) writes files
+you ◀─report── main model relays                  ◀─done───┘
 ```
 
-## Why this design
+Type `/save` at the end of a working session. Claude filters the conversation through a value test — *"will this line change someone's actions two weeks from now?"* — and writes the survivors into tidy Markdown notes: decisions with their reasons, root causes (not symptoms), exact commands and paths, and open problems marked 🔴.
 
-- **Plain Markdown + wikilinks.** Your memory is yours: readable in Obsidian or any editor, greppable, diffable, versioned in git. No databases, no embeddings, no lock-in.
+Next week, in a brand-new chat:
+
+> **you:** /recall news bot
+>
+> **Claude:** Found **[[Bots/news-bot-setup]]** (3 entries, last 2026-05-08) — webhook behind nginx, token lives in `.env`, rate limit is 30 msg/sec. 🔴 open: the retry fix is written but not deployed.
+
+Saved something you regret? `/unsave` shows you exactly what the last save wrote and removes it after you confirm.
+
+## Why you might like this design
+
+- **Plain Markdown + wikilinks.** Your memory is yours: readable in Obsidian or any editor, greppable, diffable, versioned in git. No embeddings, no vector store, nothing to host.
 - **Append-only.** A save never rewrites old knowledge — it appends a dated `## /SAVE #N` section. History is never destroyed; a `📌 Current state` block on top keeps recall fast.
 - **Cheap.** In a long chat, every tool call re-sends the whole conversation to the expensive model. Here the expensive model makes *one* call (the brief), and a subagent on a cheaper model does the 8-12 file operations in a tiny context.
-- **Honest about what matters.** The save filter is a value test — *"will this line change someone's actions two weeks from now?"* — with priority on invariants, root causes, decisions-with-rejected-alternatives, exact identifiers, and open problems 🔴.
-- **Explicit.** Nothing runs automatically. `/save` and `/recall` fire only when you ask.
+- **Explicit.** Nothing runs behind your back. `/save` and `/recall` fire only when you ask.
+- **Battle-tested rules.** One project = one folder (two bots on the same stack are still two projects — Claude asks instead of guessing). Secrets never reach the files: they become `<<REDACTED>>`, and a mechanical gate double-checks before any git push.
 
 ## Install
 
@@ -33,11 +51,11 @@ cd claude-auto-memory
 ./install.sh ~/my-vault      # or your Obsidian vault
 ```
 
-The installer copies `skills/save`, `skills/recall`, `skills/unsave` into `~/.claude/skills/` and the three agents into `~/.claude/agents/`, pointing them at your memory base. Restart Claude Code afterwards.
+The installer copies `skills/save`, `skills/recall`, `skills/unsave` into `~/.claude/skills/` and the three agents into `~/.claude/agents/`, pointing them at your memory base. Restart Claude Code afterwards — that's it.
 
 ## Configure
 
-1. **Topics → folders.** Edit `~/.claude/skills/save/topics.md` — replace the sample folders (`Bots/`, `Infra/`, …) with your projects. This one table is the single source of truth for both skills.
+1. **Topics → folders.** Edit `~/.claude/skills/save/topics.md` — replace the sample folders (`Bots/`, `Infra/`, …) with your projects. This one table is the single source of truth for all skills.
 2. **Language.** Memory files are written in *your* language automatically; filenames stay English kebab-case.
 3. **Model for the file work.** The agents default to `model: sonnet`; change the frontmatter to `haiku` for maximum thrift.
 
@@ -89,7 +107,6 @@ Conflict policy: commit first, `pull --rebase`, push; on a real rebase conflict 
 - **Save mid-session in long conversations.** Claude Code compacts the start of very long chats; a `/save` at the very end may no longer see early details. Saving once in the middle and once at the end captures everything (repeat saves append — nothing is overwritten).
 - **Let Claude remind you.** Add this line to your `~/.claude/CLAUDE.md` and Claude will offer a `/save` once when a long conversation has accumulated unsaved decisions:
   > If the conversation has grown long, contains important decisions or fixes, and there has been no /save for a while — briefly offer to run /save once (knowledge from the start of a long chat gets lost to context compaction). Do not repeat the offer.
-- **One project = one folder.** The save skill asks before filing a new project, and never merges two projects silently — two bots on the same stack are still two folders.
 - **`/unsave` is a tidy-up, not secure deletion.** If the base syncs via git, undone content remains in git history.
 
 ## Anatomy
